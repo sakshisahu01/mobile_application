@@ -199,30 +199,23 @@ class _WalletRewardsScreenState extends State<WalletRewardsScreen>
   List<Map<String, dynamic>> _getFilteredTransactions() {
     if (_selectedFilter == 'All') return transactions;
     if (_selectedFilter == 'Earnings') {
-      return (transactions as List)
-          .where(
-            (dynamic t) =>
-                (t as Map<String, dynamic>)["amount"] > 0 &&
-                (t)["status"] != 'bonus',
-          )
-          .toList()
-          .cast<Map<String, dynamic>>();
+      return transactions.where((t) {
+        final amount = t['amount'];
+        final status = t['status']?.toString();
+        return (amount is num && amount > 0) && (status != 'bonus');
+      }).toList();
     }
     if (_selectedFilter == 'Redemptions') {
-      return (transactions as List)
-          .where(
-            (dynamic t) => (t as Map<String, dynamic>)["status"] == 'redeemed',
-          )
-          .toList()
-          .cast<Map<String, dynamic>>();
+      return transactions.where((t) {
+        final status = t['status']?.toString();
+        return status == 'redeemed';
+      }).toList();
     }
     if (_selectedFilter == 'Bonuses') {
-      return (transactions as List)
-          .where(
-            (dynamic t) => (t as Map<String, dynamic>)["status"] == 'bonus',
-          )
-          .toList()
-          .cast<Map<String, dynamic>>();
+      return transactions.where((t) {
+        final status = t['status']?.toString();
+        return status == 'bonus';
+      }).toList();
     }
     return transactions;
   }
@@ -347,10 +340,13 @@ class _WalletRewardsScreenState extends State<WalletRewardsScreen>
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      'Wallet & Rewards',
-                      style: theme.textTheme.headlineSmall?.copyWith(
-                        fontWeight: FontWeight.w600,
+                    Expanded(
+                      child: Text(
+                        'Wallet & Rewards',
+                        style: theme.textTheme.headlineSmall?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                     Row(
@@ -421,6 +417,20 @@ class _WalletRewardsScreenState extends State<WalletRewardsScreen>
                 child: ListView(
                   padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 2.h),
                   children: [
+                    // DEBUG: Visible marker to verify wallet content is built
+                    Container(
+                      width: double.infinity,
+                      padding: EdgeInsets.all(3.w),
+                      decoration: BoxDecoration(
+                        color: Colors.blue.withValues(alpha: 0.05),
+                        border: Border.all(color: Colors.blue.withValues(alpha: 0.15)),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Center(
+                        child: Text('DEBUG: Wallet content visible', style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.primary)),
+                      ),
+                    ),
+                    SizedBox(height: 2.h),
                     // Balance Card
                     BalanceCardWidget(
                       coins: walletData["coins"] as int,

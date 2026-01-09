@@ -46,8 +46,7 @@ class _TransactionItemWidgetState extends State<TransactionItemWidget> {
     final theme = Theme.of(context);
     final amount = widget.transaction["amount"] as int;
     final isPositive = amount > 0;
-    final multipliers =
-        widget.transaction["multipliers"] as Map<String, dynamic>;
+    final multipliers = (widget.transaction["multipliers"] as Map?)?.cast<String, dynamic>() ?? <String, dynamic>{};
 
     return Card(
       elevation: 1,
