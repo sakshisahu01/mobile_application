@@ -105,7 +105,7 @@ class _LoginScreenState extends State<LoginScreen>
     final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: theme.colorScheme.background,
+      backgroundColor: const Color(0xFFE3F2FD),
       body: Stack(
         children: [
           // No background header - color only applied to logo
