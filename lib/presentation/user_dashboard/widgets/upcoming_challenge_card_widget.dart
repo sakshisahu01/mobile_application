@@ -96,14 +96,14 @@ class _UpcomingChallengeCardWidgetState
       width: double.infinity,
       padding: EdgeInsets.all(4.w),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
+        color: const Color(0xFFF7F2FF), // light purple background for upcoming challenge
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: typeColor.withValues(alpha: 0.3), width: 2),
+        border: Border.all(color: const Color(0xFFEDE2FF).withOpacity(0.9), width: 1.5),
         boxShadow: [
           BoxShadow(
-            color: typeColor.withValues(alpha: 0.1),
+            color: const Color(0xFFEDE2FF).withOpacity(0.5),
             blurRadius: 12,
-            offset: Offset(0, 4),
+            offset: Offset(0, 6),
           ),
         ],
       ),
@@ -115,12 +115,12 @@ class _UpcomingChallengeCardWidgetState
               Container(
                 padding: EdgeInsets.all(2.w),
                 decoration: BoxDecoration(
-                  color: typeColor.withValues(alpha: 0.1),
+                  color: const Color(0xFFEDE2FF),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
                   _getChallengeTypeIcon(),
-                  color: typeColor,
+                  color: const Color(0xFF6D2DFF),
                   size: 24,
                 ),
               ),
@@ -161,7 +161,7 @@ class _UpcomingChallengeCardWidgetState
           Container(
             padding: EdgeInsets.all(3.w),
             decoration: BoxDecoration(
-              color: theme.colorScheme.primary.withValues(alpha: 0.1),
+              color: const Color(0xFFEDE2FF),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Column(
@@ -169,7 +169,7 @@ class _UpcomingChallengeCardWidgetState
                 Text(
                   'Starts in',
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
+                    color: const Color(0xFF6D2DFF),
                   ),
                 ),
                 SizedBox(height: 0.5.h),
@@ -179,7 +179,7 @@ class _UpcomingChallengeCardWidgetState
                     isLight: theme.brightness == Brightness.light,
                     fontSize: 28,
                     fontWeight: FontWeight.w700,
-                  ).copyWith(color: theme.colorScheme.primary),
+                  ).copyWith(color: const Color(0xFF6D2DFF)),
                 ),
               ],
             ),

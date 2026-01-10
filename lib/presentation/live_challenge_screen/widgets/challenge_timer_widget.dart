@@ -44,30 +44,37 @@ class ChallengeTimerWidget extends StatelessWidget {
 
     return Column(
       children: [
-        // Circular progress indicator with timer
+        // Circular progress indicator with timer (larger & bolder)
         CircularPercentIndicator(
-          radius: 20.w,
-          lineWidth: 2.w,
+          radius: 24.w,
+          lineWidth: 3.w,
           percent: progress,
-          center: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                _formatTime(remainingSeconds),
-                style: theme.textTheme.displaySmall?.copyWith(
-                  color: timerColor,
-                  fontWeight: FontWeight.w700,
-                  fontSize: 32.sp,
+          center: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+            ),
+            padding: EdgeInsets.all(1.w),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  _formatTime(remainingSeconds),
+                  style: theme.textTheme.displaySmall?.copyWith(
+                    color: timerColor,
+                    fontWeight: FontWeight.w800,
+                    fontSize: 36.sp,
+                  ),
                 ),
-              ),
-              SizedBox(height: 0.5.h),
-              Text(
-                'remaining',
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
+                SizedBox(height: 0.5.h),
+                Text(
+                  'remaining',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
           progressColor: timerColor,
           backgroundColor: theme.colorScheme.surface,
@@ -83,6 +90,7 @@ class ChallengeTimerWidget extends StatelessWidget {
           decoration: BoxDecoration(
             color: timerColor.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(8),
+            boxShadow: [BoxShadow(color: timerColor.withValues(alpha: 0.08), blurRadius: 8, offset: Offset(0, 2))],
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -97,8 +105,8 @@ class ChallengeTimerWidget extends StatelessWidget {
                 progress > 0.5
                     ? 'You have plenty of time'
                     : progress > 0.2
-                    ? 'Time is running out'
-                    : 'Hurry! Submit now',
+                        ? 'Time is running out'
+                        : 'Hurry! Submit now',
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: timerColor,
                   fontWeight: FontWeight.w600,

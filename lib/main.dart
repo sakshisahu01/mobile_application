@@ -41,7 +41,7 @@ class MyApp extends StatelessWidget {
     return Sizer(
       builder: (context, orientation, screenType) {
         return MaterialApp(
-          title: 'flashhustle',
+          title: 'flash hustle',
           theme: AppTheme.lightTheme,
           darkTheme: AppTheme.darkTheme,
           themeMode: ThemeMode.light,

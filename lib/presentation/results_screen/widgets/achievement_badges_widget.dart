@@ -20,7 +20,7 @@ class AchievementBadgesWidget extends StatelessWidget {
     if (newBadges.isEmpty) return const SizedBox.shrink();
 
     return Container(
-      width: 90.w,
+      width: double.infinity,
       padding: EdgeInsets.all(4.w),
       decoration: BoxDecoration(
         gradient: LinearGradient(

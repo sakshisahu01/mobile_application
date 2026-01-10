@@ -5,25 +5,31 @@ import '../presentation/live_challenge_screen/live_challenge_screen.dart';
 import '../presentation/user_dashboard/user_dashboard.dart';
 import '../presentation/prediction_challenge_screen/prediction_challenge_screen.dart';
 import '../presentation/wallet_rewards_screen/wallet_rewards_screen.dart';
+import '../presentation/leaderboard/leaderboard_screen.dart';
+import '../presentation/auth/login_screen.dart';
 
 class AppRoutes {
   // TODO: Add your routes here
   static const String initial = '/';
+  static const String login = '/login';
   static const String results = '/results-screen';
   static const String quizChallengeInterface = '/quiz-challenge-interface';
   static const String liveChallenge = '/live-challenge-screen';
   static const String userDashboard = '/user-dashboard';
   static const String predictionChallenge = '/prediction-challenge-screen';
   static const String walletRewards = '/wallet-rewards-screen';
+  static const String leaderboard = '/leaderboard-screen';
 
   static Map<String, WidgetBuilder> routes = {
-    initial: (context) => const UserDashboard(),
+    initial: (context) => const LoginScreen(),
+    login: (context) => const LoginScreen(),
     results: (context) => const ResultsScreen(),
     quizChallengeInterface: (context) => const QuizChallengeInterface(),
     liveChallenge: (context) => const LiveChallengeScreen(),
     userDashboard: (context) => const UserDashboard(),
     predictionChallenge: (context) => const PredictionChallengeScreen(),
     walletRewards: (context) => const WalletRewardsScreen(),
+    leaderboard: (context) => const LeaderboardScreen(),
     // TODO: Add your other routes here
   };
 }

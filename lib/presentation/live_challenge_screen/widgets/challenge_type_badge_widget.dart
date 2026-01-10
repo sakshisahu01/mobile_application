@@ -46,11 +46,12 @@ class ChallengeTypeBadgeWidget extends StatelessWidget {
     final challengeTheme = _getChallengeTheme(theme);
 
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.h),
+      padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 8),
       decoration: BoxDecoration(
-        color: (challengeTheme['color'] as Color).withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(20),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
         border: Border.all(color: challengeTheme['color'] as Color, width: 1.5),
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 6, offset: Offset(0, 2))],
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -58,14 +59,14 @@ class ChallengeTypeBadgeWidget extends StatelessWidget {
           CustomIconWidget(
             iconName: challengeTheme['icon'] as String,
             color: challengeTheme['color'] as Color,
-            size: 20,
+            size: 18,
           ),
           SizedBox(width: 2.w),
           Text(
             challengeTheme['label'] as String,
             style: theme.textTheme.labelLarge?.copyWith(
               color: challengeTheme['color'] as Color,
-              fontWeight: FontWeight.w600,
+              fontWeight: FontWeight.w700,
             ),
           ),
         ],

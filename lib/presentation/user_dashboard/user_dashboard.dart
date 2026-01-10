@@ -25,6 +25,23 @@ class UserDashboardState extends State<UserDashboard> {
   ];
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final args = ModalRoute.of(context)?.settings.arguments;
+    if (args is Map && args['initialIndex'] is int) {
+      final newIndex = args['initialIndex'] as int;
+      if (newIndex != currentIndex) {
+        setState(() => currentIndex = newIndex);
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (navigatorKey.currentState != null && routes.length > newIndex) {
+            navigatorKey.currentState!.pushReplacementNamed(routes[newIndex]);
+          }
+        });
+      }
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Navigator(

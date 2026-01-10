@@ -11,6 +11,10 @@ class QuizContentWidget extends StatelessWidget {
   final Function(int, String) onAnswerSelected;
   final VoidCallback onNextQuestion;
   final VoidCallback onPreviousQuestion;
+  final VoidCallback? onOpenCamera; // open video recorder
+  final VoidCallback? onOpenMic; // open audio recorder
+  final String? recordedAudioPath;
+  final String? recordedVideoPath;
 
   const QuizContentWidget({
     Key? key,
@@ -19,6 +23,10 @@ class QuizContentWidget extends StatelessWidget {
     required this.onAnswerSelected,
     required this.onNextQuestion,
     required this.onPreviousQuestion,
+    this.onOpenCamera,
+    this.onOpenMic,
+    this.recordedAudioPath,
+    this.recordedVideoPath,
   }) : super(key: key);
 
   // Mock quiz questions
@@ -257,7 +265,8 @@ class QuizContentWidget extends StatelessWidget {
           );
         }).toList()),
 
-        SizedBox(height: 3.h),
+        SizedBox(height: 2.h),
+
 
         // Navigation buttons
         Row(

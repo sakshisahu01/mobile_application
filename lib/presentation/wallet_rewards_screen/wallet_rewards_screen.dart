@@ -417,20 +417,6 @@ class _WalletRewardsScreenState extends State<WalletRewardsScreen>
                 child: ListView(
                   padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 2.h),
                   children: [
-                    // DEBUG: Visible marker to verify wallet content is built
-                    Container(
-                      width: double.infinity,
-                      padding: EdgeInsets.all(3.w),
-                      decoration: BoxDecoration(
-                        color: Colors.blue.withValues(alpha: 0.05),
-                        border: Border.all(color: Colors.blue.withValues(alpha: 0.15)),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Center(
-                        child: Text('DEBUG: Wallet content visible', style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.primary)),
-                      ),
-                    ),
-                    SizedBox(height: 2.h),
                     // Balance Card
                     BalanceCardWidget(
                       coins: walletData["coins"] as int,

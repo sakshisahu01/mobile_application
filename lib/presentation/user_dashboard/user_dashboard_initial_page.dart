@@ -71,6 +71,31 @@ class _UserDashboardInitialPageState extends State<UserDashboardInitialPage> {
       "earnedDate": DateTime.now().subtract(Duration(days: 2)),
       "isNew": false,
     },
+    // New demo achievements
+    {
+      "badgeId": "badge_004",
+      "name": "Speed Runner",
+      "icon": "whatshot",
+      "color": 0xFF9B59FF,
+      "earnedDate": DateTime.now().subtract(Duration(hours: 6)),
+      "isNew": true,
+    },
+    {
+      "badgeId": "badge_005",
+      "name": "Consistent Player",
+      "icon": "calendar_today",
+      "color": 0xFF7A39FF,
+      "earnedDate": DateTime.now().subtract(Duration(days: 3)),
+      "isNew": false,
+    },
+    {
+      "badgeId": "badge_006",
+      "name": "Top Scorer",
+      "icon": "star",
+      "color": 0xFF6D2DFF,
+      "earnedDate": DateTime.now().subtract(Duration(days: 4)),
+      "isNew": false,
+    },
   ];
 
   final List<Map<String, dynamic>> challengeHistory = [

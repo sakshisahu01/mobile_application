@@ -56,7 +56,7 @@ class _LeaderboardPositionWidgetState extends State<LeaderboardPositionWidget>
     final rankChange = (widget.previousRank - widget.currentRank).abs();
 
     return Container(
-      width: 90.w,
+      width: double.infinity,
       padding: EdgeInsets.all(4.w),
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,

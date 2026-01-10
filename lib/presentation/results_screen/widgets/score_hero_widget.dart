@@ -28,8 +28,8 @@ class ScoreHeroWidget extends StatelessWidget {
       animation: scoreAnimation,
       builder: (context, child) {
         return Container(
-          width: 90.w,
-          padding: EdgeInsets.symmetric(vertical: 4.h, horizontal: 5.w),
+          width: double.infinity,
+          padding: EdgeInsets.symmetric(vertical: 4.h, horizontal: 4.w),
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topLeft,

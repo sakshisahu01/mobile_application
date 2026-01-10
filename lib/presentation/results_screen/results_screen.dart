@@ -139,6 +139,7 @@ class _ResultsScreenState extends State<ResultsScreen>
       body: SafeArea(
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
+          padding: EdgeInsets.symmetric(horizontal: 4.w),
           child: Column(
             children: [
               SizedBox(height: 2.h),

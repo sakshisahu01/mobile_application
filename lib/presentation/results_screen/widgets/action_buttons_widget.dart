@@ -22,7 +22,7 @@ class ActionButtonsWidget extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Container(
-      width: 90.w,
+      width: double.infinity,
       padding: EdgeInsets.all(4.w),
       child: Column(
         children: [

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import '../../core/app_export.dart';
 import '../../widgets/custom_icon_widget.dart';
@@ -12,6 +13,7 @@ import './widgets/quiz_content_widget.dart';
 import './widgets/speed_multiplier_widget.dart';
 import './widgets/submission_button_widget.dart';
 import './widgets/video_recording_widget.dart';
+import './widgets/audio_recording_widget.dart';
 
 /// Live Challenge Screen - Immersive 15-minute challenge experience
 /// with real-time countdown timer and WebSocket synchronization
@@ -37,12 +39,63 @@ class _LiveChallengeScreenState extends State<LiveChallengeScreen>
 
   // Video state
   String? _recordedVideoPath;
+  String? _recordedAudioPath;
 
   // Prediction state
   double _predictionValue = 50.0;
 
   // Speed multiplier tracking
   bool _isSpeedBonusActive = true;
+
+  // Media collected during challenge
+  String? _collectedAudioPath;
+  String? _collectedVideoPath;
+
+  // Permission & media flags
+  bool _mediaPermsChecked = false;
+  bool _mediaAllowedByUser = false;
+
+  void _openVideoRecorder() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) => Padding(
+        padding: MediaQuery.of(context).viewInsets,
+        child: FractionallySizedBox(
+          heightFactor: 0.9,
+          child: VideoRecordingWidget(
+            onVideoRecorded: (path) {
+              setState(() {
+                _collectedVideoPath = path;
+                _recordedVideoPath = path; // for video submission path
+              });
+              Navigator.of(context).pop();
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _openAudioRecorder() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) => Padding(
+        padding: MediaQuery.of(context).viewInsets,
+        child: FractionallySizedBox(
+          heightFactor: 0.45,
+          child: AudioRecordingWidget(
+            onAudioRecorded: (path) {
+              setState(() {
+                _collectedAudioPath = path;
+              });
+            },
+          ),
+        ),
+      ),
+    );
+  }
 
   // Animation controllers
   late AnimationController _timerAnimationController;
@@ -52,8 +105,11 @@ class _LiveChallengeScreenState extends State<LiveChallengeScreen>
   void initState() {
     super.initState();
     _initializeChallenge();
-    _startCountdown();
     _setupAnimations();
+    // Prompt the user for camera & mic permissions before starting the challenge
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _promptForMediaPermissionsBeforeStart();
+    });
   }
 
   void _initializeChallenge() {
@@ -72,7 +128,7 @@ class _LiveChallengeScreenState extends State<LiveChallengeScreen>
     _timerAnimationController = AnimationController(
       vsync: this,
       duration: Duration(seconds: 900),
-    )..forward();
+    );
 
     _pulseAnimationController = AnimationController(
       vsync: this,
@@ -81,6 +137,9 @@ class _LiveChallengeScreenState extends State<LiveChallengeScreen>
   }
 
   void _startCountdown() {
+    // start the visual timer animation and countdown
+    _timerAnimationController.forward();
+
     _countdownTimer = Timer.periodic(Duration(seconds: 1), (timer) {
       if (!mounted) {
         timer.cancel();
@@ -220,12 +279,75 @@ class _LiveChallengeScreenState extends State<LiveChallengeScreen>
     });
   }
 
+  Future<void> _promptForMediaPermissionsBeforeStart() async {
+    // Show a modal dialog similar to the browser dialog in the screenshot.
+    final choice = await showDialog<String>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: Text('Allow camera & microphone?'),
+        content: Text(
+          'This challenge may allow you to answer using audio or video. We need access to your camera and microphone.\n\nChoose "Allow" to grant permission. You can also deny and continue without media support.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop('never'),
+            child: Text('Never allow'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop('allow_once'),
+            child: Text('Allow this time'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.of(context).pop('allow'),
+            child: Text('Allow while visiting the site'),
+          ),
+        ],
+      ),
+    );
+
+    // If user chose allow, request platform permissions.
+    if (choice == 'allow' || choice == 'allow_once') {
+      final granted = await _requestMediaPermissions();
+      if (!granted) {
+        // If any permission was denied, show a short message but still start.
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Camera/microphone permission denied. Media features will be disabled.'),
+            ),
+          );
+        }
+      } else {
+        _mediaAllowedByUser = true;
+      }
+    } else {
+      // User explicitly chose 'never' — keep media disabled
+      _mediaAllowedByUser = false;
+    }
+
+    _mediaPermsChecked = true;
+
+    // Start the challenge after the choice is made
+    if (mounted) {
+      _startCountdown();
+    }
+  }
+
+  Future<bool> _requestMediaPermissions() async {
+    final cameraStatus = await Permission.camera.request();
+    final micStatus = await Permission.microphone.request();
+
+    return cameraStatus.isGranted || micStatus.isGranted;
+  }
+
   bool _canSubmit() {
     if (_hasSubmitted) return false;
 
     switch (_selectedChallengeType) {
       case 'Quiz':
-        return _quizAnswers.length >= 3; // At least 3 questions answered
+        // Allow submission either when 3+ answers are provided OR if audio/video was recorded as an answer
+        return _quizAnswers.length >= 3 || _collectedAudioPath != null || _collectedVideoPath != null;
       case 'Video':
         return _recordedVideoPath != null;
       case 'Prediction':
@@ -274,7 +396,15 @@ class _LiveChallengeScreenState extends State<LiveChallengeScreen>
           ),
         );
 
-        return shouldExit ?? false;
+        if (shouldExit == true && mounted) {
+          Navigator.of(context, rootNavigator: true).pushNamedAndRemoveUntil(
+            AppRoutes.userDashboard,
+            (route) => false,
+            arguments: {'initialIndex': 0},
+          );
+          return false;
+        }
+        return false;
       },
       child: Scaffold(
         backgroundColor: theme.scaffoldBackgroundColor,
@@ -330,7 +460,11 @@ class _LiveChallengeScreenState extends State<LiveChallengeScreen>
                             );
 
                             if (shouldExit == true && mounted) {
-                              Navigator.of(context).pop();
+                              Navigator.of(context, rootNavigator: true).pushNamedAndRemoveUntil(
+                                AppRoutes.userDashboard,
+                                (route) => false,
+                                arguments: {'initialIndex': 0},
+                              );
                             }
                           },
                         ),
@@ -398,34 +532,113 @@ class _LiveChallengeScreenState extends State<LiveChallengeScreen>
   Widget _buildChallengeContent(ThemeData theme) {
     switch (_selectedChallengeType) {
       case 'Quiz':
-        return QuizContentWidget(
-          currentQuestionIndex: _currentQuestionIndex,
-          selectedAnswers: _quizAnswers,
-          onAnswerSelected: _handleQuizAnswer,
-          onNextQuestion: () {
-            setState(() {
-              _currentQuestionIndex++;
-            });
-          },
-          onPreviousQuestion: () {
-            setState(() {
-              if (_currentQuestionIndex > 0) {
-                _currentQuestionIndex--;
-              }
-            });
-          },
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            QuizContentWidget(
+              currentQuestionIndex: _currentQuestionIndex,
+              selectedAnswers: _quizAnswers,
+              onAnswerSelected: _handleQuizAnswer,
+              onNextQuestion: () {
+                setState(() {
+                  _currentQuestionIndex++;
+                });
+              },
+              onPreviousQuestion: () {
+                setState(() {
+                  if (_currentQuestionIndex > 0) {
+                    _currentQuestionIndex--;
+                  }
+                });
+              },
+              onOpenCamera: _openVideoRecorder,
+              onOpenMic: _openAudioRecorder,
+              recordedAudioPath: _collectedAudioPath,
+              recordedVideoPath: _collectedVideoPath,
+            ),
+
+            SizedBox(height: 2.h),
+
+            if (!_canSubmit())
+              Container(
+                width: double.infinity,
+                padding: EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+                decoration: BoxDecoration(
+                  color: Color(0xFFFFF8F1),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Color(0xFFF59E0B).withOpacity(0.6)),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.info_outline, color: Color(0xFFF59E0B)),
+                    SizedBox(width: 8),
+                    Expanded(child: Text('Complete the challenge to submit', style: theme.textTheme.bodyMedium?.copyWith(color: Color(0xFFF59E0B), fontWeight: FontWeight.w600))),
+                  ],
+                ),
+              ),
+          ],
         );
 
       case 'Video':
-        return VideoRecordingWidget(
-          onVideoRecorded: _handleVideoRecorded,
-          recordedVideoPath: _recordedVideoPath,
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            VideoRecordingWidget(
+              onVideoRecorded: _handleVideoRecorded,
+              recordedVideoPath: _recordedVideoPath,
+            ),
+
+            SizedBox(height: 2.h),
+
+            if (!_canSubmit())
+              Container(
+                width: double.infinity,
+                padding: EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+                decoration: BoxDecoration(
+                  color: Color(0xFFFFF8F1),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Color(0xFFF59E0B).withOpacity(0.6)),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.info_outline, color: Color(0xFFF59E0B)),
+                    SizedBox(width: 8),
+                    Expanded(child: Text('Complete the challenge to submit', style: theme.textTheme.bodyMedium?.copyWith(color: Color(0xFFF59E0B), fontWeight: FontWeight.w600))),
+                  ],
+                ),
+              ),
+          ],
         );
 
       case 'Prediction':
-        return PredictionContentWidget(
-          predictionValue: _predictionValue,
-          onPredictionChanged: _handlePredictionChange,
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            PredictionContentWidget(
+              predictionValue: _predictionValue,
+              onPredictionChanged: _handlePredictionChange,
+            ),
+
+            SizedBox(height: 2.h),
+
+            if (!_canSubmit())
+              Container(
+                width: double.infinity,
+                padding: EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+                decoration: BoxDecoration(
+                  color: Color(0xFFFFF8F1),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Color(0xFFF59E0B).withOpacity(0.6)),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.info_outline, color: Color(0xFFF59E0B)),
+                    SizedBox(width: 8),
+                    Expanded(child: Text('Complete the challenge to submit', style: theme.textTheme.bodyMedium?.copyWith(color: Color(0xFFF59E0B), fontWeight: FontWeight.w600))),
+                  ],
+                ),
+              ),
+          ],
         );
 
       default:

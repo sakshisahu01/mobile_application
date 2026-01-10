@@ -20,11 +20,14 @@ class CustomBottomBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return BottomNavigationBar(
       currentIndex: currentIndex,
       onTap: onTap,
       type: BottomNavigationBarType.fixed,
       elevation: 8.0,
+      selectedItemColor: Colors.blue,
+      unselectedItemColor: theme.unselectedWidgetColor,
       items: [
         BottomNavigationBarItem(
           icon: Icon(Icons.dashboard_outlined, size: 24),
