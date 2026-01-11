@@ -78,6 +78,8 @@ Flash Hustle is a **gamified, skill-based mobile application** designed to encou
 * Protected user data and reward transactions
 
 ---
+APIs Used:
+Authentication API, Challenge API, Submission & Scoring API, Wallet & Rewards API, Leaderboard API, Notification API.
 
 Data flow diagram
 ┌─────────────────┐       ┌─────────────────┐
